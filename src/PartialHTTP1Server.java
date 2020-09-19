@@ -25,11 +25,17 @@ TODO
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class PartialHTTP1Server {
 
     public static int MAX_THREADS = 1;
     public static int thread_count = 0;
+
+
 
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
@@ -42,6 +48,10 @@ public class PartialHTTP1Server {
             e.printStackTrace();
         }
 
+        //Starts threadPool with maximum of 50 threads
+        ExecutorService threadPool = Executors.newFixedThreadPool(50);
+
+        //Server loop, waits for socket connection
         while(true) {
             try {
                 System.out.println("Waiting for connection on port: " + port);
@@ -49,17 +59,21 @@ public class PartialHTTP1Server {
                 if (thread_count < MAX_THREADS) {
                     System.out.println("Client connection from " + conn.getRemoteSocketAddress());
                     PartialHTTP1Threads newThread = new PartialHTTP1Threads(conn);
-                    newThread.start();
                     thread_count++;
+                    threadPool.execute(newThread);
                 } else {
-                    System.out.println("Could not start thread");
+                    System.out.println("\nCould not start thread");
                     //503 ERROR
                 }
+
             }
             catch(IOException e) {
                 e.printStackTrace();
             }
         }
+
+        //threadPool.shutdown();
+
     }
 }
 

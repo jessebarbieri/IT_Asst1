@@ -11,7 +11,7 @@ public class PartialHTTP1Threads extends Thread{
     public void run() {
         System.out.println("Thread started for --> " + this.connection.getRemoteSocketAddress());
         try {
-            this.sleep(3000);
+            this.sleep(6000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
