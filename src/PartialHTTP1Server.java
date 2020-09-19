@@ -28,6 +28,9 @@ import java.net.Socket;
 
 public class PartialHTTP1Server {
 
+    public static int MAX_THREADS = 1;
+    public static int thread_count = 0;
+
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
         ServerSocket webSocket = null;
@@ -43,9 +46,15 @@ public class PartialHTTP1Server {
             try {
                 System.out.println("Waiting for connection on port: " + port);
                 Socket conn = webSocket.accept();
-                System.out.println("Client connection from " + conn.getRemoteSocketAddress());
-                PartialHTTP1Threads newThread = new PartialHTTP1Threads(conn);
-                newThread.start();
+                if (thread_count < MAX_THREADS) {
+                    System.out.println("Client connection from " + conn.getRemoteSocketAddress());
+                    PartialHTTP1Threads newThread = new PartialHTTP1Threads(conn);
+                    newThread.start();
+                    thread_count++;
+                } else {
+                    System.out.println("Could not start thread");
+                    //503 ERROR
+                }
             }
             catch(IOException e) {
                 e.printStackTrace();
