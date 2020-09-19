@@ -11,11 +11,11 @@ public class PartialHTTP1Threads extends Thread{
     public void run() {
         System.out.println("Thread started for --> " + this.connection.getRemoteSocketAddress());
         try {
-            this.sleep(6000);
+            //Sleep thread for .25 seconds, then return thread
+            this.sleep(250);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        PartialHTTP1Server.thread_count--;
         return;
     }
 }
