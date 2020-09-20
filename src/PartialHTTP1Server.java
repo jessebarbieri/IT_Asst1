@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 public class PartialHTTP1Server {
 
-    public static int MAX_THREADS = 1;
+    public static int MAX_THREADS = 50;
     public static int thread_count = 0;
 
 
