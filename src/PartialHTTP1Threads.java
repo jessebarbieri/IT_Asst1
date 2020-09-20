@@ -16,6 +16,7 @@ public class PartialHTTP1Threads extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        PartialHTTP1Server.thread_count--;
         return;
     }
 }
