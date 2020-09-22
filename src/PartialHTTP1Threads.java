@@ -133,6 +133,7 @@ public class PartialHTTP1Threads extends Thread{
             file = new File(".", filename.substring(1, filename.length()));
             FileInputStream fileInput = new FileInputStream(file);
 
+            //Handles mimeType
             Path path = file.toPath();
             String mimeType = formatMimeType(Files.probeContentType(path));
 
@@ -156,15 +157,17 @@ public class PartialHTTP1Threads extends Thread{
             }
             output.print("Last-Modified: " + temp + "\r\n");
 
+            //Headers for all 200 OK responses
+            output.print("Allow: GET, POST, HEAD");
+            output.print("Expires: a future date");
+
             output.print("\r\n"); // End of headers
             output.write(data);
             output.close();
             return;
 
             /*
-             - Response header not found: "Content-Type: text/html"
              - Response header not found: "Content-Length: 3191"
-             - Response header not found: "Last-Modified: Wed, 15 Jul 2015 04:14:40 GMT"
              - Response header not found: "Content-Encoding: identity"
              - Response header not found: "Allow: GET, POST, HEAD"
              - Response header not found: "Expires: a future date"
