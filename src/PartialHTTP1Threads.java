@@ -1,5 +1,7 @@
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,6 +25,10 @@ public class PartialHTTP1Threads extends Thread{
 
             //Tokenizer to get method / other data
             String inLine = input.readLine();
+            String testLine = input.readLine();
+//            if (!testLine.equals("")) {
+//                System.out.println("\n\n\n\n" + testLine + "\n\n\n");
+//            }
             StringTokenizer test = new StringTokenizer(inLine);
             while (test.hasMoreTokens()) {
                 System.err.println(test.nextToken());
@@ -62,10 +68,7 @@ public class PartialHTTP1Threads extends Thread{
             }
             else if (method.equals("GET")) {
                 //HANDLE GET
-                while ((inLine = input.readLine()) != null) {
-                    if (inLine.trim().equals("")) break;
-                }
-
+                System.out.println("\n\n" + fileURL + "\n\n");
                 if (fileURL.charAt(0) != '/') {
                     output.print("HTTP/1.0 400 Bad Request\r\n");
                     output.print("\r\n"); // End of headers
@@ -85,10 +88,18 @@ public class PartialHTTP1Threads extends Thread{
 
             }
             else if (method.equals("HEAD")) {
-                //HANDLE HEAD
+                output.print("HTTP/1.0 400 Bad Request\r\n");
+                output.print("\r\n"); // End of headers
+                killThread();
+                return;
             }
             else if (method.equals("POST")) {
                 //HANDLE POST
+                output.print("HTTP/1.0 400 Bad Request\r\n");
+                output.print("\r\n"); // End of headers
+                killThread();
+                return;
+
             }
             else {
                 output.print("HTTP/1.0 400 Bad Request\r\n");
@@ -123,6 +134,10 @@ public class PartialHTTP1Threads extends Thread{
             file = new File(".", filename.substring(1, filename.length()));
             FileInputStream fileInput = new FileInputStream(file);
 
+
+            Path path = file.toPath();
+            String mimeType = Files.probeContentType(path);
+
             //byte array to store file data
             byte[] data = new byte[(int) file.length()];
 
@@ -132,7 +147,7 @@ public class PartialHTTP1Threads extends Thread{
 
             //Sends 200 OK response header, sends file data, closes output stream, returns
             output.print("HTTP/1.0 200 OK\r\n");
-            output.print("Content-Type: text/html\r\n");
+            output.print("Content-Type: " + mimeType + "\r\n"); // TODO - add mime type support
             output.print("Content-Length: 3191\r\n");
             // output.print("Last-Modified: " + convertDate(file.lastModified()) + "\r\n");
             output.print("\r\n"); // End of headers
@@ -152,6 +167,7 @@ public class PartialHTTP1Threads extends Thread{
 
         }
         catch (IOException e) /* File not found exception */ {
+            e.printStackTrace();
             output.print("HTTP/1.0 404 Not Found\r\n");
             output.print("\r\n"); // End of headers
             output.close();
