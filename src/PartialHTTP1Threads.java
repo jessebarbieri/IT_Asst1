@@ -5,8 +5,7 @@ import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class PartialHTTP1Threads extends Thread{
 
@@ -149,7 +148,15 @@ public class PartialHTTP1Threads extends Thread{
             output.print("HTTP/1.0 200 OK\r\n");
             output.print("Content-Type: " + mimeType + "\r\n"); // TODO - add mime type support
             output.print("Content-Length: 3191\r\n");
-            // output.print("Last-Modified: " + convertDate(file.lastModified()) + "\r\n");
+
+            //Last-Modified response line
+            String temp = "";
+            try{ temp = convertDate(file.lastModified());}
+            catch (Exception e){
+                e.printStackTrace();
+            }
+            output.print("Last-Modified: " + temp + "\r\n");
+
             output.print("\r\n"); // End of headers
             output.write(data);
             output.close();
@@ -175,14 +182,13 @@ public class PartialHTTP1Threads extends Thread{
         }
     }
 
-//    private Date convertDate (long time) throws ParseException {
-//        Date returnDate = new Date();
-//        SimpleDateFormat format = new SimpleDateFormat("dd M yyyy hh:mm:ss");
-//        String temp = Long.toString(time);
-//        format.parse(temp);
-//
-//
-//        return returnDate;
-//    }
-//
+    private String convertDate (long time) throws ParseException {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(time);
+        SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+        format.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+        return format.format(calendar.getTime());
+    }
+
 }

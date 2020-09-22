@@ -7,7 +7,6 @@ TODO
     text: html, plain
     image: gif, jpeg, png
     application: octet-stream, pdf, x-gzip, zip
-
 - Response status codes:
     200     OK
     304     Not Modified
@@ -76,4 +75,3 @@ public class PartialHTTP1Server {
 
     }
 }
-
