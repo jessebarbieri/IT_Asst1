@@ -67,7 +67,6 @@ public class PartialHTTP1Threads extends Thread{
             }
             else if (method.equals("GET")) {
                 //HANDLE GET
-                System.out.println("\n\n" + fileURL + "\n\n");
                 if (fileURL.charAt(0) != '/') {
                     output.print("HTTP/1.0 400 Bad Request\r\n");
                     output.print("\r\n"); // End of headers
@@ -135,7 +134,9 @@ public class PartialHTTP1Threads extends Thread{
 
             //Handles mimeType
             Path path = file.toPath();
-            String mimeType = formatMimeType(Files.probeContentType(path));
+            String mimeType = Files.probeContentType(path);
+            if (mimeType == null) { mimeType = ""; }
+            mimeType = formatMimeType(mimeType);
 
             //byte array to store file data
             byte[] data = new byte[(int) file.length()];
@@ -147,7 +148,8 @@ public class PartialHTTP1Threads extends Thread{
             //Sends 200 OK response header, sends file data, closes output stream, returns
             output.print("HTTP/1.0 200 OK\r\n");
             output.print("Content-Type: " + mimeType + "\r\n"); // TODO - add mime type support
-            output.print("Content-Length: 3191\r\n");
+            output.print("Content-Length: " + file.length() + "\r\n");
+            System.out.println("Content Length....." + file.length());
 
             //Last-Modified response line
             String temp = "";
@@ -158,8 +160,9 @@ public class PartialHTTP1Threads extends Thread{
             output.print("Last-Modified: " + temp + "\r\n");
 
             //Headers for all 200 OK responses
-            output.print("Allow: GET, POST, HEAD");
-            output.print("Expires: a future date");
+            output.print("Allow: GET, POST, HEAD\r\n");
+            output.print("Content-Encoding: identity\r\n");
+            output.print("Expires: Wed, 03 Mar 2021 01:35:39 GMT\r\n");
 
             output.print("\r\n"); // End of headers
             output.write(data);
@@ -194,12 +197,14 @@ public class PartialHTTP1Threads extends Thread{
     }
 
     private String formatMimeType(String mimeType) {
-        if (!mimeType.equals("text/html") && !mimeType.equals("text/plain") &&!mimeType.equals("image/gif") &&
-                        !mimeType.equals("image/jpeg") &&!mimeType.equals("image/png") &&!mimeType.equals("application/pdf") &&
-                        !mimeType.equals("application/x-gzip") &&!mimeType.equals("application/zip")) {
-            mimeType = "application/octet-stream";
+        String returnMime = mimeType;
+        System.out.println("\n\n\n" + mimeType + "\n\n\n");
+        if (!(mimeType.equals("text/html")) && !(mimeType.equals("text/plain")) && !(mimeType.equals("image/gif")) &&
+                        !(mimeType.equals("image/jpeg")) && !(mimeType.equals("image/png")) && !(mimeType.equals("application/pdf")) &&
+                        !(mimeType.equals("application/x-gzip")) && !(mimeType.equals("application/zip"))) {
+            returnMime = "application/octet-stream";
         }
-        return mimeType;
+        return returnMime;
     }
 
 }
