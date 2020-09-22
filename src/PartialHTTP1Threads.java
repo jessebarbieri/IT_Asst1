@@ -133,9 +133,8 @@ public class PartialHTTP1Threads extends Thread{
             file = new File(".", filename.substring(1, filename.length()));
             FileInputStream fileInput = new FileInputStream(file);
 
-
             Path path = file.toPath();
-            String mimeType = Files.probeContentType(path);
+            String mimeType = formatMimeType(Files.probeContentType(path));
 
             //byte array to store file data
             byte[] data = new byte[(int) file.length()];
@@ -189,6 +188,15 @@ public class PartialHTTP1Threads extends Thread{
         format.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         return format.format(calendar.getTime());
+    }
+
+    private String formatMimeType(String mimeType) {
+        if (!mimeType.equals("text/html") && !mimeType.equals("text/plain") &&!mimeType.equals("image/gif") &&
+                        !mimeType.equals("image/jpeg") &&!mimeType.equals("image/png") &&!mimeType.equals("application/pdf") &&
+                        !mimeType.equals("application/x-gzip") &&!mimeType.equals("application/zip")) {
+            mimeType = "application/octet-stream";
+        }
+        return mimeType;
     }
 
 }
