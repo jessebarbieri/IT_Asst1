@@ -157,7 +157,7 @@ public class PartialHTTP1Threads extends Thread{
             }
 
             boolean dateAfter = false;
-            if (!ifModifiedDate.equals("") && !lastModified.equals("") && ifModifiedDate.indexOf("GMT") != -1) {
+            if (!ifModifiedDate.equals("") && !lastModified.equals("") && ifModifiedDate.indexOf("GMT") != -1 && !method.equals("HEAD")) {
                 try {
                     dateAfter = dateIsAfter(lastModified, ifModifiedDate);
                 } catch (Exception e) {
