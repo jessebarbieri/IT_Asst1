@@ -80,7 +80,7 @@ public class PartialHTTP1Threads extends Thread{
                 killThread();
                 return;
             }
-            else if (method.equals("GET")) {
+            else if (method.equals("GET") || (method.equals("POST"))) {
                 //HANDLE GET
                 if (fileURL.charAt(0) != '/') {
                     output.print("HTTP/1.0 400 Bad Request\r\n");
@@ -101,19 +101,25 @@ public class PartialHTTP1Threads extends Thread{
 
             }
             else if (method.equals("HEAD")) {
-                output.print("HTTP/1.0 400 Bad Request\r\n");
-                output.print("\r\n"); // End of headers
-                killThread();
-                return;
-            }
-            else if (method.equals("POST")) {
-                //HANDLE POST
-                output.print("HTTP/1.0 400 Bad Request\r\n");
-                output.print("\r\n"); // End of headers
-                killThread();
-                return;
+                //HANDLE HEAD
+                if (fileURL.charAt(0) != '/') {
+                    output.print("HTTP/1.0 400 Bad Request\r\n");
+                    output.print("\r\n"); // End of headers
+                    killThread();
+                    return;
+                }
+                if (fileURL.indexOf("../") != -1) {
+                    output.print("HTTP/1.0 400 Bad Request\r\n");
+                    output.print("\r\n"); // End of headers
+                    killThread();
+                    return;
+                }
 
+                sendFile(output, fileURL, ifModifiedDate);
+                killThread();
+                return;
             }
+
             else {
                 output.print("HTTP/1.0 400 Bad Request\r\n");
                 output.print("\r\n"); // End of headers
@@ -178,6 +184,7 @@ public class PartialHTTP1Threads extends Thread{
                 }
                 if (!dateAfter) {
                     output.print("HTTP/1.0 304 Not Modified\r\n");
+                    output.print("Expires: Wed, 02 Oct 2024 01:37:39 GMT\r\n");
                     output.print("\r\n");
                     killThread();
                     return;
