@@ -95,29 +95,10 @@ public class PartialHTTP1Threads extends Thread{
                     return;
                 }
 
-                sendFile(output, fileURL, ifModifiedDate);
+                sendFile(output, fileURL, ifModifiedDate, method);
                 killThread();
                 return;
 
-            }
-            else if (method.equals("HEAD")) {
-                //HANDLE HEAD
-                if (fileURL.charAt(0) != '/') {
-                    output.print("HTTP/1.0 400 Bad Request\r\n");
-                    output.print("\r\n"); // End of headers
-                    killThread();
-                    return;
-                }
-                if (fileURL.indexOf("../") != -1) {
-                    output.print("HTTP/1.0 400 Bad Request\r\n");
-                    output.print("\r\n"); // End of headers
-                    killThread();
-                    return;
-                }
-
-                sendFile(output, fileURL, ifModifiedDate);
-                killThread();
-                return;
             }
 
             else {
@@ -146,7 +127,7 @@ public class PartialHTTP1Threads extends Thread{
     }
 
     //Attempts to send file from server to client
-    private void sendFile(PrintStream output, String filename, String ifModifiedDate) {
+    private void sendFile(PrintStream output, String filename, String ifModifiedDate, String method) {
         File file;
         try {
             //Creates file
@@ -203,7 +184,11 @@ public class PartialHTTP1Threads extends Thread{
             output.print("Expires: Wed, 02 Oct 2024 01:37:39 GMT\r\n");
 
             output.print("\r\n"); // End of headers
-            output.write(data);
+
+            if (!method.equals("HEAD"))
+            {
+                output.write(data);
+            }
             output.close();
             return;
 
