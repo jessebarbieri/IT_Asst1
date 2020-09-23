@@ -64,14 +64,10 @@ public class PartialHTTP1Server {
                     System.out.println("\nCould not start thread");
                     //503 ERROR
                 }
-
             }
             catch(IOException e) {
                 e.printStackTrace();
             }
         }
-
-        //threadPool.shutdown();
-
     }
 }

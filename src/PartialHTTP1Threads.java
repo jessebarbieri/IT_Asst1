@@ -80,7 +80,7 @@ public class PartialHTTP1Threads extends Thread{
                 killThread();
                 return;
             }
-            else if (method.equals("GET") || (method.equals("POST"))) {
+            else if (method.equals("GET") || method.equals("POST") || method.equals("HEAD")) {
                 //HANDLE GET
                 if (fileURL.charAt(0) != '/') {
                     output.print("HTTP/1.0 400 Bad Request\r\n");
@@ -164,6 +164,7 @@ public class PartialHTTP1Threads extends Thread{
                     e.printStackTrace();
                 }
                 if (!dateAfter) {
+                    System.out.println(method + ": 304 NOT MODIFIED");
                     output.print("HTTP/1.0 304 Not Modified\r\n");
                     output.print("Expires: Wed, 02 Oct 2024 01:37:39 GMT\r\n");
                     output.print("\r\n");
@@ -234,8 +235,8 @@ public class PartialHTTP1Threads extends Thread{
     private String formatMimeType(String mimeType) {
         String returnMime = mimeType;
         if (!(mimeType.equals("text/html")) && !(mimeType.equals("text/plain")) && !(mimeType.equals("image/gif")) &&
-                        !(mimeType.equals("image/jpeg")) && !(mimeType.equals("image/png")) && !(mimeType.equals("application/pdf")) &&
-                        !(mimeType.equals("application/x-gzip")) && !(mimeType.equals("application/zip"))) {
+                !(mimeType.equals("image/jpeg")) && !(mimeType.equals("image/png")) && !(mimeType.equals("application/pdf")) &&
+                !(mimeType.equals("application/x-gzip")) && !(mimeType.equals("application/zip"))) {
             returnMime = "application/octet-stream";
         }
         return returnMime;
