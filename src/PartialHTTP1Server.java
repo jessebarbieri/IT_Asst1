@@ -1,3 +1,9 @@
+/**
+@authors Jason Wrobel, Jesse Barbieri, Ethan Wang
+ Internet Technology - 352
+ Assignment 1 - HTTP/1.0 + MIME Type Support
+**/
+
 /*
 TODO
 - GET method
@@ -36,8 +42,6 @@ public class PartialHTTP1Server {
     public static int MAX_THREADS = 50;
     public static int thread_count = 0;
 
-
-
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
         ServerSocket webSocket = null;
@@ -65,7 +69,7 @@ public class PartialHTTP1Server {
                 } else {
                     System.out.println("\nCould not start thread");
                     PrintStream output = new PrintStream(conn.getOutputStream());
-                    output.print("HTTP/1.0 503 Bad Request\r\n");
+                    output.print("HTTP/1.0 503 Service Unavailable\r\n");
                     output.print("\r\n");
                 }
             }
