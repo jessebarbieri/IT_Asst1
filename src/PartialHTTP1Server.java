@@ -21,7 +21,9 @@ TODO
  */
 
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -62,7 +64,9 @@ public class PartialHTTP1Server {
                     threadPool.execute(newThread);
                 } else {
                     System.out.println("\nCould not start thread");
-                    //503 ERROR
+                    PrintStream output = new PrintStream(conn.getOutputStream());
+                    output.print("HTTP/1.0 503 Bad Request\r\n");
+                    output.print("\r\n");
                 }
             }
             catch(IOException e) {
