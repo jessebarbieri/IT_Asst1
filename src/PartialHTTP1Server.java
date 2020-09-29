@@ -4,29 +4,6 @@
  Assignment 1 - HTTP/1.0 + MIME Type Support
 **/
 
-/*
-TODO
-- GET method
-- HEAD method
-- POST method
-- MIME type support:
-    text: html, plain
-    image: gif, jpeg, png
-    application: octet-stream, pdf, x-gzip, zip
-- Response status codes:
-    200     OK
-    304     Not Modified
-    400     Bad Request
-    403     Forbidden
-    404     Not Found
-    408     Request Timeout (if client opens a connection and does not send a request in 5 sec.)
-    500     Internal Server Error
-    501     Not Implemented
-    503     Service Unavailable
-    505     HTTP Version Not Supported
- */
-
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.ServerSocket;

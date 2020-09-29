@@ -1,3 +1,9 @@
+/**
+ @authors Jason Wrobel, Jesse Barbieri, Ethan Wang
+ Internet Technology - 352
+ Assignment 1 - HTTP/1.0 + MIME Type Support
+ **/
+
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
