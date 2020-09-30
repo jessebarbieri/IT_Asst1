@@ -210,7 +210,7 @@ public class PartialHTTP1Threads extends Thread{
                 //When last modified date is before If=Modified-Since date, sends 304 Not Modified
                 if (!dateAfter) {
                     output.print("HTTP/1.0 304 Not Modified\r\n");
-                    output.print("Expires: Wed, 02 Oct 2024 01:37:39 GMT\r\n");
+                    output.print("Expires: Sat, 21 Jul 2021 11:00:00 GMT\r\n");
                     output.print("\r\n"); // End of headers
                     killThread();
                     return;
