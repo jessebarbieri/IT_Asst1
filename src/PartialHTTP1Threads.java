@@ -44,6 +44,9 @@ public class PartialHTTP1Threads extends Thread{
                 output.print("HTTP/1.0 408 Request Timeout\r\n");
                 output.print("\r\n"); // End of headers
                 killThread();
+                output.close();
+                input.close();
+                connection.close();
                 return;
             }
 
@@ -75,6 +78,9 @@ public class PartialHTTP1Threads extends Thread{
                 output.print("HTTP/1.0 400 Bad Request\r\n");
                 output.print("\r\n"); // End of headers
                 killThread();
+                output.close();
+                input.close();
+                connection.close();
                 return;
             }
 
@@ -83,6 +89,9 @@ public class PartialHTTP1Threads extends Thread{
                 output.print("HTTP/1.0 505 HTTP Version Not Supported\r\n");
                 output.print("\r\n"); // End of headers
                 killThread();
+                output.close();
+                input.close();
+                connection.close();
                 return;
             }
 
@@ -93,6 +102,9 @@ public class PartialHTTP1Threads extends Thread{
                 output.print("HTTP/1.0 501 Not Implemented\r\n");
                 output.print("\r\n"); // End of headers
                 killThread();
+                output.close();
+                input.close();
+                connection.close();
                 return;
             }
 
@@ -103,6 +115,9 @@ public class PartialHTTP1Threads extends Thread{
                     output.print("HTTP/1.0 400 Bad Request\r\n");
                     output.print("\r\n"); // End of headers
                     killThread();
+                    output.close();
+                    input.close();
+                    connection.close();
                     return;
                 }
                 //Checks for invalid file directory, sends 400 Bad Request if directory is invalid format
@@ -110,6 +125,9 @@ public class PartialHTTP1Threads extends Thread{
                     output.print("HTTP/1.0 400 Bad Request\r\n");
                     output.print("\r\n"); // End of headers
                     killThread();
+                    output.close();
+                    input.close();
+                    connection.close();
                     return;
                 }
 
@@ -118,11 +136,17 @@ public class PartialHTTP1Threads extends Thread{
                     output.print("HTTP/1.0 403 Forbidden\r\n");
                     output.print("\r\n"); // End of headers
                     killThread();
+                    output.close();
+                    input.close();
+                    connection.close();
                     return;
                 }
 
                 //Passes control to the sendFile method, which handles other HTTP headers/sending byte data
                 sendFile(output, fileURL, ifModifiedDate, method);
+                output.close();
+                input.close();
+                connection.close();
                 killThread();
                 return;
 
@@ -133,6 +157,9 @@ public class PartialHTTP1Threads extends Thread{
                 output.print("HTTP/1.0 400 Bad Request\r\n");
                 output.print("\r\n"); // End of headers
                 killThread();
+                output.close();
+                input.close();
+                connection.close();
                 return;
             }
 
@@ -212,7 +239,6 @@ public class PartialHTTP1Threads extends Thread{
                     output.print("HTTP/1.0 304 Not Modified\r\n");
                     output.print("Expires: Sat, 21 Jul 2021 11:00:00 GMT\r\n");
                     output.print("\r\n"); // End of headers
-                    killThread();
                     return;
                 }
             }
@@ -244,6 +270,7 @@ public class PartialHTTP1Threads extends Thread{
             output.print("HTTP/1.0 404 Not Found\r\n");
             output.print("\r\n"); // End of headers
             output.close();
+            killThread();
             return;
         }
     }

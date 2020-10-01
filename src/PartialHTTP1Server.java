@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Queue;
+import java.util.concurrent.*;
 
 public class PartialHTTP1Server {
 
@@ -37,7 +37,7 @@ public class PartialHTTP1Server {
         }
 
         //Creates threadPool with maximum of 50 threads
-        ExecutorService threadPool = Executors.newFixedThreadPool(50);
+        ThreadPoolExecutor threadPool =  new ThreadPoolExecutor(5, 50, 250, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
 
         //Server loop, waits for socket connection
         while(true) {
