@@ -55,6 +55,8 @@ public class PartialHTTP1Server {
                     PrintStream output = new PrintStream(conn.getOutputStream());
                     output.print("HTTP/1.0 503 Service Unavailable\r\n");
                     output.print("\r\n");
+                    output.close();
+                    conn.close();
                 }
             }
             catch(IOException e) {
