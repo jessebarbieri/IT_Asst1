@@ -37,7 +37,7 @@ public class PartialHTTP1Server {
         }
 
         //Creates threadPool with maximum of 50 threads
-        ThreadPoolExecutor threadPool =  new ThreadPoolExecutor(5, 50, 250, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
+        ThreadPoolExecutor threadPool =  new ThreadPoolExecutor(5, 50, 250, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>(1));
 
         //Server loop, waits for socket connection
         while(true) {
