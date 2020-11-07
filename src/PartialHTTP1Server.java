@@ -12,9 +12,6 @@ import java.util.concurrent.*;
 
 public class PartialHTTP1Server {
 
-    //Global variables to store maximum number of threads, as well as active thread count
-    public static int MAX_THREADS = 50;
-    public static int thread_count = 0;
 
     /**
      * Initializes socket server and manages threads for request execution
@@ -39,27 +36,26 @@ public class PartialHTTP1Server {
         ThreadPoolExecutor threadPool =  new ThreadPoolExecutor(5, 50, 250, TimeUnit.MILLISECONDS, new SynchronousQueue<>());
 
         //Server loop, waits for socket connection
+        Socket conn = null;
+
         while(true) {
             try {
                 System.out.println("Waiting for connection on port: " + port);
-                Socket conn = webSocket.accept();
-                //If currently active threads do not exceed maximum thread count, executes new thread for connection
-                if (thread_count < MAX_THREADS) {
-                    System.out.println("Client connection from " + conn.getRemoteSocketAddress());
-                    PartialHTTP1Threads newThread = new PartialHTTP1Threads(conn);
-                    thread_count++;
-                    threadPool.execute(newThread);
-                //If maximum threads are in use, rejects connection and sends 503 Service Unavailable to output
-                } else {
+                conn = webSocket.accept();
+                System.out.println("Client connection from " + conn.getRemoteSocketAddress());
+                PartialHTTP1Threads newThread = new PartialHTTP1Threads(conn);
+                threadPool.execute(newThread);
+            }
+            catch(Exception e) {
+                try {
                     PrintStream output = new PrintStream(conn.getOutputStream());
                     output.print("HTTP/1.0 503 Service Unavailable\r\n");
                     output.print("\r\n");
                     output.close();
                     conn.close();
+                } catch (Exception exception){
+                    e.printStackTrace();
                 }
-            }
-            catch(IOException e) {
-                e.printStackTrace();
             }
         }
     }
