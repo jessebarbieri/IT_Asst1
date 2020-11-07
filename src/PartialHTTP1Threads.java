@@ -109,7 +109,7 @@ public class PartialHTTP1Threads extends Thread{
             }
 
             //Checks for GET POST HEAD, implemented HTTP methods
-            else if (method.equals("GET") || method.equals("POST") || method.equals("HEAD")) {
+            else if (method.equals("GET")|| method.equals("HEAD")) {
                 //Checks for invalid file directory, sends 400 Bad Request if directory is invalid format
                 if (fileURL.charAt(0) != '/') {
                     output.print("HTTP/1.0 400 Bad Request\r\n");
@@ -149,6 +149,12 @@ public class PartialHTTP1Threads extends Thread{
                 connection.close();
                 killThread();
                 return;
+
+            }
+
+            else if (method.equals("POST")) {
+
+                //Deal with CGI stuff
 
             }
 
