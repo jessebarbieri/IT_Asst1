@@ -179,8 +179,7 @@ public class PartialHTTP1Threads extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //Keeps track of number of active threads in the server class
-        PartialHTTP1Server.thread_count--;
+
         return;
     }
 
