@@ -132,7 +132,7 @@ public class PartialHTTP1Threads extends Thread{
                 }
 
                 //Checks for forbidden file top_secret.txt, sends 403 Forbidden
-                if (fileURL.equals("/top_secret.txt")) {
+                if (fileURL.equals("/doc_root/top_secret.txt")) {
                     output.print("HTTP/1.0 403 Forbidden\r\n");
                     output.print("\r\n"); // End of headers
                     killThread();
