@@ -45,9 +45,12 @@ public class PartialHTTP1Server {
                 System.out.println("Client connection from " + conn.getRemoteSocketAddress());
                 PartialHTTP1Threads newThread = new PartialHTTP1Threads(conn);
                 threadPool.execute(newThread);
+                System.out.println(threadPool.getActiveCount());
+//                System.out.println("THREAD ACCEPTED");
             }
             catch(Exception e) {
                 try {
+//                    System.out.println("THREAD REJECTED");
                     PrintStream output = new PrintStream(conn.getOutputStream());
                     output.print("HTTP/1.0 503 Service Unavailable\r\n");
                     output.print("\r\n");
