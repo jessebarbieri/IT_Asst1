@@ -57,11 +57,15 @@ public class PartialHTTP1Threads extends Thread{
             //Tokenizer for first input line
             StringTokenizer tokenizer = new StringTokenizer(inLine);
 
-            //Checks for If-Modified-Since: 'date'
-            String ifModified = input.readLine();
+            //Checks for If-Modified-Since: 'date' / From: 'source'
+            String inLine2 = input.readLine();
             String ifModifiedDate = "";
-            if (ifModified.indexOf("If-Modified-Since:") != -1) {
-                ifModifiedDate = ifModified.substring(19 , ifModified.length());
+            String from = "";
+
+            if (inLine2.indexOf("If-Modified-Since:") != -1) {
+                ifModifiedDate = inLine2.substring(19 , inLine2.length());
+            } else if (inLine2.indexOf("From:") != -1) {
+                from = inLine2.substring(6, inLine2.length());
             }
 
             //Holds HTTPMethod and file directory from first input line
@@ -157,11 +161,16 @@ public class PartialHTTP1Threads extends Thread{
                 //POST testing
                 System.out.println("\n================================\nSTARTING POST BLOCK: ");
                     String testString = input.readLine();
+                    System.out.println(" -->  " + from + "  <-- ");
                     while (!testString.equals("")) {
                         System.out.println(" -->  " + testString + "  <-- ");
                         testString = input.readLine();
                     }
                 System.out.println("ENDING POST BLOCK\n================================\n");
+                //End POST testing
+
+
+
             }
 
             //Upon failing all method checks, sends 400 Bad Request
