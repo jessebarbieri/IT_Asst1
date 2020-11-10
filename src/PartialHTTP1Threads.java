@@ -160,12 +160,40 @@ public class PartialHTTP1Threads extends Thread{
             else if (method.equals("POST")) {
                 //POST testing
                 System.out.println("\n================================\nSTARTING POST BLOCK: ");
-                    String testString = input.readLine();
-                    System.out.println(" -->  " + from + "  <-- ");
-                    while (!testString.equals("")) {
-                        System.out.println(" -->  " + testString + "  <-- ");
-                        testString = input.readLine();
+                    String inputLine = input.readLine();
+                                                    System.out.println(" -->  " + from + "  <-- ");
+                    String userAgent, contentType, contentLength, name, cost;
+                    userAgent = "";
+                    contentType = "";
+                    contentLength = "";
+                    name = "";
+                    cost = "";
+
+                    while (inputLine != null && !inputLine.equals("")) {
+
+                        if (inputLine.indexOf("User-Agent:") != -1) {
+                            userAgent = inputLine.substring(12, inputLine.length());
+                        } else if (inputLine.indexOf("Content-Type") != -1) {
+                            contentType = inputLine.substring(13, inputLine.length());
+                        } else if (inputLine.indexOf("Content-Length") != -1) {
+                            contentLength = inputLine.substring(15, inputLine.length());
+                        } else if (inputLine.indexOf("Name") != -1) {
+                            name = inputLine.substring(5, inputLine.indexOf("&"));
+                            cost = inputLine.substring(inputLine.indexOf("cost=") + 5, inputLine.length());
+                        }
+
+                        inputLine = input.readLine();
+                        if (inputLine.equals("")) {
+
+                        }
+
                     }
+                System.out.println(" -->  UserAgent: " + userAgent + "  <-- ");
+                System.out.println(" -->  ContentType: " + contentType + "  <-- ");
+                System.out.println(" -->  ContentLength: " + contentLength + "  <-- ");
+                System.out.println(" -->  Name: " + name + "  <-- ");
+                System.out.println(" -->  Cost: " + cost + "  <-- ");
+
                 System.out.println("ENDING POST BLOCK\n================================\n");
                 //End POST testing
 
