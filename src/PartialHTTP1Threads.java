@@ -4,6 +4,7 @@
  Assignment 1 - HTTP/1.0 + MIME Type Support
  **/
 
+import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -153,9 +154,14 @@ public class PartialHTTP1Threads extends Thread{
             }
 
             else if (method.equals("POST")) {
-
-                //Deal with CGI stuff
-
+                //POST testing
+                System.out.println("\n================================\nSTARTING POST BLOCK: ");
+                    String testString = input.readLine();
+                    while (!testString.equals("")) {
+                        System.out.println(" -->  " + testString + "  <-- ");
+                        testString = input.readLine();
+                    }
+                System.out.println("ENDING POST BLOCK\n================================\n");
             }
 
             //Upon failing all method checks, sends 400 Bad Request
