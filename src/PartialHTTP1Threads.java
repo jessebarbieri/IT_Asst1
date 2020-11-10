@@ -184,7 +184,7 @@ public class PartialHTTP1Threads extends Thread{
 
                         inputLine = input.readLine();
                         if (inputLine.equals("")) {
-
+                            inputLine = input.readLine();
                         }
 
                     }
