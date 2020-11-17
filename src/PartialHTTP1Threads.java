@@ -113,7 +113,7 @@ public class PartialHTTP1Threads extends Thread{
                 return;
             }
 
-            //Checks for GET POST HEAD, implemented HTTP methods
+            //Checks for GET HEAD, implemented HTTP methods
             else if (method.equals("GET")|| method.equals("HEAD")) {
                 //Checks for invalid file directory, sends 400 Bad Request if directory is invalid format
                 if (fileURL.charAt(0) != '/') {
@@ -201,6 +201,18 @@ public class PartialHTTP1Threads extends Thread{
                 System.out.println("ENDING POST BLOCK\n================================\n");
                 //End POST testing
 
+
+                //Checks for missing Content Length field, sends HTTP/1.0 411 Length Required
+                if (contentLength.equals("")) {
+                    //HTTP/1.0 411 Length Required
+                    output.print("HTTP/1.0 411 Length Required\r\n");
+                    output.print("\r\n"); // End of headers
+                    killThread();
+                    output.close();
+                    input.close();
+                    connection.close();
+                    return;
+                }
 
 
             }
