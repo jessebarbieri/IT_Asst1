@@ -159,7 +159,7 @@ public class PartialHTTP1Threads extends Thread{
 
             else if (method.equals("POST")) {
                 //POST testing
-                System.out.println("\n================================\nSTARTING POST BLOCK: ");
+//                System.out.println("\n================================\nSTARTING POST BLOCK: ");
                     String inputLine = input.readLine();
                                                     System.out.println(" -->  " + from + "  <-- ");
                     String userAgent, contentType, contentLength, name, cost;
@@ -183,28 +183,23 @@ public class PartialHTTP1Threads extends Thread{
                         }
 
                         inputLine = input.readLine();
-                        if (inputLine.equals("")) {
-                            try {
-                                inputLine = input.readLine();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
 
                     }
-                System.out.println(" -->  UserAgent: " + userAgent + "  <-- ");
-                System.out.println(" -->  ContentType: " + contentType + "  <-- ");
-                System.out.println(" -->  ContentLength: " + contentLength + "  <-- ");
-                System.out.println(" -->  Name: " + name + "  <-- ");
-                System.out.println(" -->  Cost: " + cost + "  <-- ");
 
-                System.out.println("ENDING POST BLOCK\n================================\n");
-                //End POST testing
+//                System.out.println(" -->  UserAgent: " + userAgent + "  <-- ");
+//                System.out.println(" -->  ContentType: " + contentType + "  <-- ");
+//                System.out.println(" -->  ContentLength: " + contentLength + "  <-- ");
+//
+//                //Code never gets this
+//                System.out.println(" -->  Name: " + name + "  <-- ");
+//                System.out.println(" -->  Cost: " + cost + "  <-- ");
+//
+//                System.out.println("ENDING POST BLOCK\n================================\n");
+//                //End POST testing
 
 
                 //Checks for missing Content Length field, sends HTTP/1.0 411 Length Required
                 if (contentLength.equals("")) {
-                    //HTTP/1.0 411 Length Required
                     output.print("HTTP/1.0 411 Length Required\r\n");
                     output.print("\r\n"); // End of headers
                     killThread();
@@ -213,6 +208,62 @@ public class PartialHTTP1Threads extends Thread{
                     connection.close();
                     return;
                 }
+
+                //Checks for missing Content Type field, sends HTTP/1.0 500 Internal Server Error
+                if (contentType.equals("")) {
+                    output.print("HTTP/1.0 500 Internal Server Error\r\n");
+                    output.print("\r\n"); // End of headers
+                    killThread();
+                    output.close();
+                    input.close();
+                    connection.close();
+                    return;
+                }
+
+                //Checks for non-cgi file type, sends HTTP/1.0 405 Method Not Allowed
+                if (!fileURL.substring(fileURL.length() - 3).equals("cgi")) {
+                    output.print("HTTP/1.0 405 Method Not Allowed\r\n");
+                    output.print("\r\n"); // End of headers
+                    killThread();
+                    output.close();
+                    input.close();
+                    connection.close();
+                    return;
+                }
+
+                File cgiFile = new File(".", fileURL.substring(1, fileURL.length()));
+
+//                if (!cgiFile.canExecute()) {
+                if (fileURL.indexOf("forbidden") != -1) {
+                    output.print("HTTP/1.0 403 Forbidden\r\n");
+                    output.print("\r\n"); // End of headers
+                    killThread();
+                    output.close();
+                    input.close();
+                    connection.close();
+                    return;
+                }
+
+                String cmd = "." + fileURL;
+
+//                ProcessBuilder proc = new ProcessBuilder(cmd);
+//                Process temp = proc.start();
+//                System.out.println(temp.getInputStream().readAllBytes());
+
+                ProcessBuilder pb = new ProcessBuilder("/cgi_bin/upcase.cgi");
+                pb.directory( new File(".") );
+                Map<String, String> env = pb.environment();
+                env.clear();
+                env.put( "QUERY_STRING", "abc" );
+                Process p = pb.start();
+                InputStream instream = p.getInputStream();
+                FileOutputStream save = new FileOutputStream("result.txt");
+                int ch;
+                while( (ch=instream.read()) != -1 ) {
+                    save.write( (byte)ch );
+                }
+                save.close();
+
 
 
             }
@@ -393,4 +444,34 @@ public class PartialHTTP1Threads extends Thread{
         return returnMime;
     }
 
+    /**
+     * Decodes a string by removing the encoding characters
+     * @param input string to be decoded
+     * @return decoded string
+     */
+    private String decodeString(String input) {
+        // Characters that require decoding ---> "!*'();:@$+,/?#[] "
+        for (int i = 0; i < input.length(); i++) {
+            if (input.charAt(i) == '!') {
+                input = removeChar(i, input);
+            }
+        }
+        return input;
+    }
+
+    /**
+     * Removes a char from a string at a given index
+     * @param index index to remove char from
+     * @param input string to modify
+     * @return input with char removed
+     */
+    private String removeChar(int index, String input) {
+        String ret = "";
+        for (int i = 0; i < input.length(); i++) {
+            if (i != index) {
+                ret += input.charAt(i);
+            }
+        }
+        return ret;
+    }
 }
