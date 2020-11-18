@@ -379,6 +379,11 @@ public class PartialHTTP1Threads extends Thread{
             if (mimeType == null) { mimeType = ""; }
             mimeType = formatMimeType(mimeType);
 
+            //Set mime type to octet-stream for cgi scripts
+            if (filename.indexOf(".cgi") != -1) {
+                mimeType = "application/octet-stream";
+            }
+
             //Byte array to store file data
             byte[] data = new byte[(int) file.length()];
 
