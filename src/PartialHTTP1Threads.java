@@ -30,9 +30,10 @@ public class PartialHTTP1Threads extends Thread{
      */
     public void run() {
         try {
+
             //Gets outputstream and inputstream from socket (connection)
             PrintStream output = new PrintStream(this.connection.getOutputStream());
-            BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            BufferedInputStream input = new BufferedInputStream(connection.getInputStream());
 
             //Waits 5 seconds for request from client
             long startTime = System.currentTimeMillis(); //fetch starting time
@@ -51,21 +52,38 @@ public class PartialHTTP1Threads extends Thread{
                 return;
             }
 
+
+            StringBuilder sb = new StringBuilder();
+            while(input.available() > 0) {
+                char c = (char) input.read();
+                sb.append(c);
+            }
+
+            String[] inputLines = sb.toString().split("\r\n");
+            for (int i = 0; i < inputLines.length; i++) {
+                inputLines[i] = decodeString(inputLines[i]);
+                System.out.println(inputLines[i]);
+            }
+
+
             //Reads first input line into a string
-            String inLine = input.readLine();
+            String inLine = inputLines[0];
 
             //Tokenizer for first input line
             StringTokenizer tokenizer = new StringTokenizer(inLine);
 
-            //Checks for If-Modified-Since: 'date' / From: 'source'
-            String inLine2 = input.readLine();
             String ifModifiedDate = "";
             String from = "";
 
-            if (inLine2.indexOf("If-Modified-Since:") != -1) {
-                ifModifiedDate = inLine2.substring(19 , inLine2.length());
-            } else if (inLine2.indexOf("From:") != -1) {
-                from = inLine2.substring(6, inLine2.length());
+            //Checks for If-Modified-Since: 'date' / From: 'source'
+            if (inputLines.length >= 2) {
+                String inLine2 = inputLines[1];
+
+                if (inLine2.indexOf("If-Modified-Since:") != -1) {
+                    ifModifiedDate = inLine2.substring(19, inLine2.length());
+                } else if (inLine2.indexOf("From:") != -1) {
+                    from = inLine2.substring(6, inLine2.length());
+                }
             }
 
             //Holds HTTPMethod and file directory from first input line
@@ -160,14 +178,15 @@ public class PartialHTTP1Threads extends Thread{
             else if (method.equals("POST")) {
                 //POST testing
 //                System.out.println("\n================================\nSTARTING POST BLOCK: ");
-                    String inputLine = input.readLine();
-                                                    System.out.println(" -->  " + from + "  <-- ");
-                    String userAgent, contentType, contentLength, name, cost;
+                    int currentIndex = 2;
+                    String inputLine = inputLines[currentIndex];
+                    System.out.println(" -->  " + from + "  <-- ");
+                    String userAgent, contentType, contentLength, scriptInput;
                     userAgent = "";
                     contentType = "";
                     contentLength = "";
-                    name = "";
-                    cost = "";
+                    scriptInput = "";
+
 
                     while (inputLine != null && !inputLine.equals("")) {
 
@@ -177,25 +196,24 @@ public class PartialHTTP1Threads extends Thread{
                             contentType = inputLine.substring(13, inputLine.length());
                         } else if (inputLine.indexOf("Content-Length") != -1) {
                             contentLength = inputLine.substring(15, inputLine.length());
-                        } else if (inputLine.indexOf("Name") != -1) {
-                            name = inputLine.substring(5, inputLine.indexOf("&"));
-                            cost = inputLine.substring(inputLine.indexOf("cost=") + 5, inputLine.length());
+                        } else if (inputLine.equals("")) {
+                            scriptInput = inputLines[currentIndex + 1];
                         }
 
-                        inputLine = input.readLine();
+                        inputLine = inputLines[currentIndex + 1];
+                        currentIndex++;
 
                     }
 
-//                System.out.println(" -->  UserAgent: " + userAgent + "  <-- ");
-//                System.out.println(" -->  ContentType: " + contentType + "  <-- ");
-//                System.out.println(" -->  ContentLength: " + contentLength + "  <-- ");
-//
-//                //Code never gets this
-//                System.out.println(" -->  Name: " + name + "  <-- ");
-//                System.out.println(" -->  Cost: " + cost + "  <-- ");
-//
-//                System.out.println("ENDING POST BLOCK\n================================\n");
-//                //End POST testing
+                System.out.println(" -->  UserAgent: " + userAgent + "  <-- ");
+                System.out.println(" -->  ContentType: " + contentType + "  <-- ");
+                System.out.println(" -->  ContentLength: " + contentLength + "  <-- ");
+
+                //Code never gets this
+                System.out.println(" -->  ScriptInput: " + scriptInput + "  <-- ");
+
+                System.out.println("ENDING POST BLOCK\n================================\n");
+                //End POST testing
 
 
                 //Checks for missing Content Length field, sends HTTP/1.0 411 Length Required
@@ -246,23 +264,23 @@ public class PartialHTTP1Threads extends Thread{
 
                 String cmd = "." + fileURL;
 
-//                ProcessBuilder proc = new ProcessBuilder(cmd);
-//                Process temp = proc.start();
-//                System.out.println(temp.getInputStream().readAllBytes());
+                ProcessBuilder proc = new ProcessBuilder(cmd);
+                Process temp = proc.start();
+                System.out.println(temp.getInputStream().readAllBytes());
 
-                ProcessBuilder pb = new ProcessBuilder("/cgi_bin/upcase.cgi");
-                pb.directory( new File(".") );
-                Map<String, String> env = pb.environment();
-                env.clear();
-                env.put( "QUERY_STRING", "abc" );
-                Process p = pb.start();
-                InputStream instream = p.getInputStream();
-                FileOutputStream save = new FileOutputStream("result.txt");
-                int ch;
-                while( (ch=instream.read()) != -1 ) {
-                    save.write( (byte)ch );
-                }
-                save.close();
+//                ProcessBuilder pb = new ProcessBuilder("/cgi_bin/upcase.cgi");
+//                pb.directory( new File(".") );
+//                Map<String, String> env = pb.environment();
+//                env.clear();
+//                env.put( "QUERY_STRING", "abc" );
+//                Process p = pb.start();
+//                InputStream instream = p.getInputStream();
+//                FileOutputStream save = new FileOutputStream("result.txt");
+//                int ch;
+//                while( (ch=instream.read()) != -1 ) {
+//                    save.write( (byte)ch );
+//                }
+//                save.close();
 
 
 
