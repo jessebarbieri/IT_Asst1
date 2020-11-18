@@ -188,28 +188,22 @@ public class PartialHTTP1Threads extends Thread{
                     scriptInput = "";
 
 
-                    while (inputLine != null && !inputLine.equals("")) {
-
+                    for (int i = currentIndex; i < inputLines.length; i++) {
+                        inputLine = inputLines[i];
                         if (inputLine.indexOf("User-Agent:") != -1) {
                             userAgent = inputLine.substring(12, inputLine.length());
                         } else if (inputLine.indexOf("Content-Type") != -1) {
                             contentType = inputLine.substring(13, inputLine.length());
                         } else if (inputLine.indexOf("Content-Length") != -1) {
                             contentLength = inputLine.substring(15, inputLine.length());
-                        } else if (inputLine.equals("")) {
-                            scriptInput = inputLines[currentIndex + 1];
+                        } else if (!inputLine.equals("")) {
+                            scriptInput = inputLines[i];
                         }
-
-                        inputLine = inputLines[currentIndex + 1];
-                        currentIndex++;
-
                     }
 
                 System.out.println(" -->  UserAgent: " + userAgent + "  <-- ");
                 System.out.println(" -->  ContentType: " + contentType + "  <-- ");
                 System.out.println(" -->  ContentLength: " + contentLength + "  <-- ");
-
-                //Code never gets this
                 System.out.println(" -->  ScriptInput: " + scriptInput + "  <-- ");
 
                 System.out.println("ENDING POST BLOCK\n================================\n");
