@@ -199,9 +199,6 @@ public class PartialHTTP1Threads extends Thread{
                     }
                 }
 
-                System.out.println(" -->  ContentLength:" + contentLength + "<-- ");
-
-
                 //Checks for missing Content Length field, sends HTTP/1.0 411 Length Required
                 if (contentLength.equals("")) {
                     output.print("HTTP/1.0 411 Length Required\r\n");
