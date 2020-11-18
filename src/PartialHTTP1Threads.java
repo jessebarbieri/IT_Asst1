@@ -178,38 +178,28 @@ public class PartialHTTP1Threads extends Thread{
             }
 
             else if (method.equals("POST")) {
-                //POST testing
-//                System.out.println("\n================================\nSTARTING POST BLOCK: ");
-                    int currentIndex = 2;
-                    String inputLine = inputLines[currentIndex];
-                    System.out.println(" -->  " + from + "  <-- ");
-                    String userAgent, contentType, contentLength, scriptInput;
-                    userAgent = "";
-                    contentType = "";
-                    contentLength = "";
-                    scriptInput = "";
+                int currentIndex = 2;
+                String userAgent, contentType, contentLength, scriptInput, inputLine;
+                userAgent = "";
+                contentType = "";
+                contentLength = "";
+                scriptInput = "";
 
 
-                    for (int i = currentIndex; i < inputLines.length; i++) {
-                        inputLine = inputLines[i];
-                        if (inputLine.indexOf("User-Agent:") != -1) {
-                            userAgent = inputLine.substring(12, inputLine.length());
-                        } else if (inputLine.indexOf("Content-Type") != -1) {
-                            contentType = inputLine.substring(13, inputLine.length());
-                        } else if (inputLine.indexOf("Content-Length") != -1) {
-                            contentLength = inputLine.substring(15, inputLine.length());
-                        } else if (!inputLine.equals("")) {
-                            scriptInput = inputLines[i];
-                        }
+                for (int i = currentIndex; i < inputLines.length; i++) {
+                    inputLine = inputLines[i];
+                    if (inputLine.indexOf("User-Agent:") != -1) {
+                        userAgent = inputLine.substring(12, inputLine.length());
+                    } else if (inputLine.indexOf("Content-Type") != -1) {
+                        contentType = inputLine.substring(13, inputLine.length());
+                    } else if (inputLine.indexOf("Content-Length") != -1) {
+                        contentLength = inputLine.substring(15, inputLine.length());
+                    } else if (!inputLine.equals("")) {
+                        scriptInput = inputLines[i];
                     }
+                }
 
-//                System.out.println(" -->  UserAgent: " + userAgent + "  <-- ");
-//                System.out.println(" -->  ContentType: " + contentType + "  <-- ");
-//                System.out.println(" -->  ContentLength: " + contentLength + "  <-- ");
-//                System.out.println(" -->  ScriptInput: " + scriptInput + "  <-- ");
-//
-//                System.out.println("ENDING POST BLOCK\n================================\n");
-//                //End POST testing
+                System.out.println(" -->  ContentLength:" + contentLength + "<-- ");
 
 
                 //Checks for missing Content Length field, sends HTTP/1.0 411 Length Required
