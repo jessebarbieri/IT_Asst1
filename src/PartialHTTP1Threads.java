@@ -55,13 +55,14 @@ public class PartialHTTP1Threads extends Thread{
                 return;
             }
 
-
+            //String builder that compiles the input into a String
             StringBuilder sb = new StringBuilder();
             while(input.available() > 0) {
                 char c = (char) input.read();
                 sb.append(c);
             }
 
+            //Splits the string from the StringBuilder by \r\n, or the end of each individual input line
             String[] inputLines = sb.toString().split("\r\n");
             for (int i = 0; i < inputLines.length; i++) {
                 inputLines[i] = decodeString(inputLines[i]);
@@ -178,28 +179,42 @@ public class PartialHTTP1Threads extends Thread{
             }
 
             else if (method.equals("POST")) {
+                /*
+                 * Sets current index to 2, skipping the HTTP method input and from input, as they are already
+                 * handled in the beginning of the code before the method type is checked
+                 */
+
                 int currentIndex = 2;
+
+                //Strings to store input fields
                 String userAgent, contentType, contentLength, scriptInput, inputLine;
                 userAgent = "";
                 contentType = "";
                 contentLength = "";
                 scriptInput = "";
 
-
+                //Loops through all inputs from client request, stores fields in correct variables
                 for (int i = currentIndex; i < inputLines.length; i++) {
                     inputLine = inputLines[i];
+                    //User-Agent input
                     if (inputLine.indexOf("User-Agent:") != -1) {
                         userAgent = inputLine.substring(12, inputLine.length());
+                    //Content-Type input
                     } else if (inputLine.indexOf("Content-Type") != -1) {
                         contentType = inputLine.substring(13, inputLine.length());
+                    //Content-Length input
                     } else if (inputLine.indexOf("Content-Length") != -1) {
                         contentLength = inputLine.substring(15, inputLine.length());
+                    /*
+                     * If input is none of the prior inputs and the line is not empty, the input is
+                     * the payload to be sent to the CGI script
+                     */
                     } else if (!inputLine.equals("")) {
                         scriptInput = inputLines[i];
                     }
                 }
 
-                //Checks for missing Content Length field, sends HTTP/1.0 411 Length Required
+                //If Content-Length field is missing from request, send 411 Length Required header
                 if (contentLength.equals("")) {
                     output.print("HTTP/1.0 411 Length Required\r\n");
                     output.print("\r\n"); // End of headers
@@ -210,7 +225,7 @@ public class PartialHTTP1Threads extends Thread{
                     return;
                 }
 
-                //Checks for missing Content Type field, sends HTTP/1.0 500 Internal Server Error
+                //If the Content-Type field is missing from request, send 500 Internal Server Error header
                 if (contentType.equals("")) {
                     output.print("HTTP/1.0 500 Internal Server Error\r\n");
                     output.print("\r\n"); // End of headers
@@ -221,7 +236,7 @@ public class PartialHTTP1Threads extends Thread{
                     return;
                 }
 
-                //Checks for non-cgi file type, sends HTTP/1.0 405 Method Not Allowed
+                //If the file extension is not a .cgi file, send 405 Method Not Allowed header
                 if (!fileURL.substring(fileURL.length() - 3).equals("cgi")) {
                     output.print("HTTP/1.0 405 Method Not Allowed\r\n");
                     output.print("\r\n"); // End of headers
@@ -232,8 +247,10 @@ public class PartialHTTP1Threads extends Thread{
                     return;
                 }
 
+                //Create a file with the URL of the CGI script
                 File cgiFile = new File(".", fileURL.substring(1, fileURL.length()));
 
+                //If the file does not have execute permissions, send 403 Forbidden header
                 if (!cgiFile.canExecute()) {
                     output.print("HTTP/1.0 403 Forbidden\r\n");
                     output.print("\r\n"); // End of headers
@@ -244,6 +261,7 @@ public class PartialHTTP1Threads extends Thread{
                     return;
                 }
 
+                //If content length is 0 and script is not env.cgi or basic.cgi, send 204 No Content header
                 if (Integer.parseInt(contentLength.trim()) == 0 && (fileURL.indexOf("env.cgi") == -1 && fileURL.indexOf("basic.cgi") == -1)) {
                     output.print("HTTP/1.0 204 No Content\r\n");
                     output.print("\r\n"); // End of headers
@@ -259,31 +277,36 @@ public class PartialHTTP1Threads extends Thread{
 
                 //Process builder to run the CGI scripts
                 ProcessBuilder proc = new ProcessBuilder(cmd);
+
+                //Set environment variables for env.cgi
                 proc.environment().put("CONTENT_LENGTH", contentLength.trim());
                 proc.environment().put("HTTP_FROM", from);
                 proc.environment().put("HTTP_USER_AGENT", userAgent);
                 proc.environment().put("SCRIPT_NAME", fileURL);
 
+                //Start process
                 Process process = proc.start();
 
-                //BufferedReader and StringBuilder to take output from the ProcessBuilder
+                //BufferedReader and BufferedWriter to write to the script and read from the script's output
                 BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
+                //If content length is not 0, write it to the script's input
                 if (Integer.parseInt(contentLength.trim()) != 0) {
                     writer.write(scriptInput);
                     writer.flush();
                     writer.close();
                 }
 
-                System.out.println("OUTPUT FOR--->    URL: " + cmd + "    SCRIPT INPUT: " + scriptInput + "\n");
+                //Read output to out string
                 String s = null;
                 String out = "";
                 while ((s = reader.readLine()) != null) {
                     System.out.println(s);
                     out += s;
                 }
-                System.out.println("\n\n");
+
+                //Send HTTP headers
                 output.print("HTTP/1.0 200 OK\r\n");
                 output.print("Content-Type: text/html" + "\r\n");
                 output.print("Content-Length: " + out.length() + "\r\n");
@@ -291,8 +314,10 @@ public class PartialHTTP1Threads extends Thread{
                 output.print("Expires: Wed, 02 Oct 2024 01:37:39 GMT\r\n");
                 output.print("\r\n"); // End of headers
 
+                //Write payload to output as Byte array
                 output.write(out.getBytes());
 
+                //Shutdown thread
                 killThread();
                 output.close();
                 input.close();
