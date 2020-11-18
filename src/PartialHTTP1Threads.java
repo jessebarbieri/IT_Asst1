@@ -9,6 +9,7 @@ import com.sun.source.tree.WhileLoopTree;
 import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
+import java.nio.Buffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
@@ -261,23 +262,37 @@ public class PartialHTTP1Threads extends Thread{
                 String cmd = "." + fileURL;
 
                 //Process builder to run the CGI scripts
-                ProcessBuilder proc = new ProcessBuilder(cmd, scriptInput);
+                ProcessBuilder proc = new ProcessBuilder(cmd);
                 Process process = proc.start();
 
                 //BufferedReader and StringBuilder to take output from the ProcessBuilder
                 BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+
+                writer.write(scriptInput);
+                writer.flush();
+                writer.close();
+
                 System.out.println("OUTPUT FOR--->    URL: " + cmd + "    SCRIPT INPUT: " + scriptInput + "\n");
                 String s = null;
+                String out = "";
                 while ((s = reader.readLine()) != null) {
                     System.out.println(s);
+                    out += s;
                 }
                 System.out.println("\n\n");
                 output.print("HTTP/1.0 200 OK\r\n");
                 output.print("Content-Type: text/html" + "\r\n");
-                output.print("Content-Length: " + 1 + "\r\n");
+                output.print("Content-Length: " + out.length() + "\r\n");
                 output.print("Allow: GET, POST, HEAD\r\n");
                 output.print("Expires: Wed, 02 Oct 2024 01:37:39 GMT\r\n");
+                output.print(out + "\r\n");
                 output.print("\r\n"); // End of headers
+                killThread();
+                output.close();
+                input.close();
+                connection.close();
+                return;
 
             }
 
