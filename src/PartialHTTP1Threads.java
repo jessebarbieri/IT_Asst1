@@ -262,19 +262,16 @@ public class PartialHTTP1Threads extends Thread{
 
                 //Process builder to run the CGI scripts
                 ProcessBuilder proc = new ProcessBuilder(cmd);
-                proc.environment().put("Content-Length", contentLength.trim());
-                proc.environment().put("From", from);
-                proc.environment().put("User-Agent", userAgent);
-                proc.environment().put("Script-Name", fileURL);
+                proc.environment().put("CONTENT_LENGTH", contentLength.trim());
+                proc.environment().put("HTTP_FROM", from);
+                proc.environment().put("HTTP_USER_AGENT", userAgent);
+                proc.environment().put("SCRIPT_NAME", fileURL);
 
                 Process process = proc.start();
 
                 //BufferedReader and StringBuilder to take output from the ProcessBuilder
                 BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-
-
-
 
                 if (Integer.parseInt(contentLength.trim()) != 0) {
                     writer.write(scriptInput);
