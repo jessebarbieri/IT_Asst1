@@ -4,6 +4,8 @@
  Assignment 1 - HTTP/1.0 + MIME Type Support
  **/
 
+import com.sun.source.tree.WhileLoopTree;
+
 import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
@@ -245,8 +247,8 @@ public class PartialHTTP1Threads extends Thread{
 
                 File cgiFile = new File(".", fileURL.substring(1, fileURL.length()));
 
-//                if (!cgiFile.canExecute()) {
-                if (fileURL.indexOf("forbidden") != -1) {
+                if (!cgiFile.canExecute()) {
+                //if (fileURL.indexOf("forbidden") != -1) {
                     output.print("HTTP/1.0 403 Forbidden\r\n");
                     output.print("\r\n"); // End of headers
                     killThread();
@@ -258,9 +260,23 @@ public class PartialHTTP1Threads extends Thread{
 
                 String cmd = "." + fileURL;
 
-                ProcessBuilder proc = new ProcessBuilder(cmd);
-                Process temp = proc.start();
-                System.out.println(temp.getInputStream().readAllBytes());
+                ProcessBuilder proc = new ProcessBuilder(cmd, scriptInput);
+                Process process = proc.start();
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                StringBuilder stringBuilder = new StringBuilder();
+                String outputLine = "";
+                while ((outputLine = reader.readLine()) != null) {
+                    stringBuilder.append(outputLine);
+                }
+                outputLine = stringBuilder.toString();
+
+                output.print("HTTP/1.0 200 OK\r\n");
+                output.print("Content-Type: text/html" + "\r\n");
+                output.print("Content-Length: " + outputLine.length() + "\r\n");
+                output.print("Allow: GET, POST, HEAD\r\n");
+                output.print("Expires: Wed, 02 Oct 2024 01:37:39 GMT\r\n");
+                output.print("\r\n"); // End of headers
 
 //                ProcessBuilder pb = new ProcessBuilder("/cgi_bin/upcase.cgi");
 //                pb.directory( new File(".") );
