@@ -248,7 +248,6 @@ public class PartialHTTP1Threads extends Thread{
                 File cgiFile = new File(".", fileURL.substring(1, fileURL.length()));
 
                 if (!cgiFile.canExecute()) {
-                //if (fileURL.indexOf("forbidden") != -1) {
                     output.print("HTTP/1.0 403 Forbidden\r\n");
                     output.print("\r\n"); // End of headers
                     killThread();
@@ -258,7 +257,7 @@ public class PartialHTTP1Threads extends Thread{
                     return;
                 }
 
-                if (scriptInput.equals("")) {
+                if (Integer.parseInt(contentLength) == 0 && (fileURL.indexOf("env.cgi") == -1 && fileURL.indexOf("basic.cgi") == -1)) {
                     output.print("HTTP/1.0 204 No Content\r\n");
                     output.print("\r\n"); // End of headers
                     killThread();
@@ -279,9 +278,11 @@ public class PartialHTTP1Threads extends Thread{
                 BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
-                writer.write(scriptInput);
-                writer.flush();
-                writer.close();
+                if (Integer.parseInt(contentLength) != 0) {
+                    writer.write(scriptInput);
+                    writer.flush();
+                    writer.close();
+                }
 
                 System.out.println("OUTPUT FOR--->    URL: " + cmd + "    SCRIPT INPUT: " + scriptInput + "\n");
                 String s = null;
