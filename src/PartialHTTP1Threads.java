@@ -247,7 +247,7 @@ public class PartialHTTP1Threads extends Thread{
                     return;
                 }
 
-                if (Integer.parseInt(contentLength) == 0 && (fileURL.indexOf("env.cgi") == -1 && fileURL.indexOf("basic.cgi") == -1)) {
+                if (Integer.parseInt(contentLength.trim()) == 0 && (fileURL.indexOf("env.cgi") == -1 && fileURL.indexOf("basic.cgi") == -1)) {
                     output.print("HTTP/1.0 204 No Content\r\n");
                     output.print("\r\n"); // End of headers
                     killThread();
@@ -268,7 +268,7 @@ public class PartialHTTP1Threads extends Thread{
                 BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
-                if (Integer.parseInt(contentLength) != 0) {
+                if (Integer.parseInt(contentLength.trim()) != 0) {
                     writer.write(scriptInput);
                     writer.flush();
                     writer.close();
