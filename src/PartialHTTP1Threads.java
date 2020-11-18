@@ -258,6 +258,16 @@ public class PartialHTTP1Threads extends Thread{
                     return;
                 }
 
+                if (scriptInput.equals("")) {
+                    output.print("HTTP/1.0 204 No Content\r\n");
+                    output.print("\r\n"); // End of headers
+                    killThread();
+                    output.close();
+                    input.close();
+                    connection.close();
+                    return;
+                }
+
                 //URL of cgi script to be run by the ProcessBuilder
                 String cmd = "." + fileURL;
 
@@ -281,11 +291,11 @@ public class PartialHTTP1Threads extends Thread{
                     out += s;
                 }
                 System.out.println("\n\n");
-                output.print("HTTP/1.0 200 OK\r\n");
-                output.print("Content-Type: text/html" + "\r\n");
+//                output.print("HTTP/1.0 200 OK\r\n");
+//                output.print("Content-Type: text/html" + "\r\n");
                 output.print("Content-Length: " + out.length() + "\r\n");
-                output.print("Allow: GET, POST, HEAD\r\n");
-                output.print("Expires: Wed, 02 Oct 2024 01:37:39 GMT\r\n");
+//                output.print("Allow: GET, POST, HEAD\r\n");
+//                output.print("Expires: Wed, 02 Oct 2024 01:37:39 GMT\r\n");
                 output.print(out + "\r\n");
                 output.print("\r\n"); // End of headers
                 killThread();
