@@ -64,7 +64,6 @@ public class PartialHTTP1Threads extends Thread{
             String[] inputLines = sb.toString().split("\r\n");
             for (int i = 0; i < inputLines.length; i++) {
                 inputLines[i] = decodeString(inputLines[i]);
-                System.out.println(inputLines[i]);
             }
 
 
@@ -203,13 +202,13 @@ public class PartialHTTP1Threads extends Thread{
                         }
                     }
 
-                System.out.println(" -->  UserAgent: " + userAgent + "  <-- ");
-                System.out.println(" -->  ContentType: " + contentType + "  <-- ");
-                System.out.println(" -->  ContentLength: " + contentLength + "  <-- ");
-                System.out.println(" -->  ScriptInput: " + scriptInput + "  <-- ");
-
-                System.out.println("ENDING POST BLOCK\n================================\n");
-                //End POST testing
+//                System.out.println(" -->  UserAgent: " + userAgent + "  <-- ");
+//                System.out.println(" -->  ContentType: " + contentType + "  <-- ");
+//                System.out.println(" -->  ContentLength: " + contentLength + "  <-- ");
+//                System.out.println(" -->  ScriptInput: " + scriptInput + "  <-- ");
+//
+//                System.out.println("ENDING POST BLOCK\n================================\n");
+//                //End POST testing
 
 
                 //Checks for missing Content Length field, sends HTTP/1.0 411 Length Required
@@ -258,41 +257,27 @@ public class PartialHTTP1Threads extends Thread{
                     return;
                 }
 
+                //URL of cgi script to be run by the ProcessBuilder
                 String cmd = "." + fileURL;
 
+                //Process builder to run the CGI scripts
                 ProcessBuilder proc = new ProcessBuilder(cmd, scriptInput);
                 Process process = proc.start();
 
+                //BufferedReader and StringBuilder to take output from the ProcessBuilder
                 BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                StringBuilder stringBuilder = new StringBuilder();
-                String outputLine = "";
-                while ((outputLine = reader.readLine()) != null) {
-                    stringBuilder.append(outputLine);
+                System.out.println("OUTPUT FOR--->    URL: " + cmd + "    SCRIPT INPUT: " + scriptInput + "\n");
+                String s = null;
+                while ((s = reader.readLine()) != null) {
+                    System.out.println(s);
                 }
-                outputLine = stringBuilder.toString();
-
+                System.out.println("\n\n");
                 output.print("HTTP/1.0 200 OK\r\n");
                 output.print("Content-Type: text/html" + "\r\n");
-                output.print("Content-Length: " + outputLine.length() + "\r\n");
+                output.print("Content-Length: " + 1 + "\r\n");
                 output.print("Allow: GET, POST, HEAD\r\n");
                 output.print("Expires: Wed, 02 Oct 2024 01:37:39 GMT\r\n");
                 output.print("\r\n"); // End of headers
-
-//                ProcessBuilder pb = new ProcessBuilder("/cgi_bin/upcase.cgi");
-//                pb.directory( new File(".") );
-//                Map<String, String> env = pb.environment();
-//                env.clear();
-//                env.put( "QUERY_STRING", "abc" );
-//                Process p = pb.start();
-//                InputStream instream = p.getInputStream();
-//                FileOutputStream save = new FileOutputStream("result.txt");
-//                int ch;
-//                while( (ch=instream.read()) != -1 ) {
-//                    save.write( (byte)ch );
-//                }
-//                save.close();
-
-
 
             }
 
