@@ -16,7 +16,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class PartialHTTP1Threads extends Thread{
+public class HTTP1Threads extends Thread{
 
     Socket connection;
 
@@ -24,7 +24,7 @@ public class PartialHTTP1Threads extends Thread{
      * Creates new thread object to be executed from Server class
      * @param conn from client
      */
-    public PartialHTTP1Threads(Socket conn) {
+    public HTTP1Threads(Socket conn) {
         this.connection = conn;
     }
 

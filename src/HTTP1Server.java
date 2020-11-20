@@ -10,7 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.*;
 
-public class PartialHTTP1Server {
+public class HTTP1Server {
 
 
     /**
@@ -43,7 +43,7 @@ public class PartialHTTP1Server {
                 System.out.println("Waiting for connection on port: " + port);
                 conn = webSocket.accept();
                 System.out.println("Client connection from " + conn.getRemoteSocketAddress());
-                PartialHTTP1Threads newThread = new PartialHTTP1Threads(conn);
+                HTTP1Threads newThread = new HTTP1Threads(conn);
                 threadPool.execute(newThread);
                 System.out.println(threadPool.getActiveCount());
 //                System.out.println("THREAD ACCEPTED");
