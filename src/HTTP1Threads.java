@@ -302,7 +302,6 @@ public class HTTP1Threads extends Thread{
                 String s = null;
                 String out = "";
                 while ((s = reader.readLine()) != null) {
-                    System.out.println(s);
                     out += s;
                 }
 
