@@ -4,8 +4,6 @@
  Assignment 1 - HTTP/1.0 + MIME Type Support
  **/
 
-import com.sun.source.tree.WhileLoopTree;
-
 import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
@@ -15,6 +13,11 @@ import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.net.*;
+import java.util.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 
 public class HTTP1Threads extends Thread{
 
@@ -369,7 +372,12 @@ public class HTTP1Threads extends Thread{
 
         try {
             //Instantiates file and gets inputstream from file
-            file = new File(".", filename.substring(1, filename.length()));
+
+            if (filename.equals("/")) {
+                file = new File(".", "/index.html");
+            } else {
+                file = new File(".", filename.substring(1, filename.length()));
+            }
             FileInputStream fileInput = new FileInputStream(file);
 
             //Gets file's mimeType and stores in mimeType -- Defaults to octet-stream if mime type is not supported
@@ -420,6 +428,19 @@ public class HTTP1Threads extends Thread{
                 }
             }
 
+            LocalDateTime myDateObj = LocalDateTime.now();
+            DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            String formattedDate = myDateObj.format(myFormatObj);
+            System.out.printf("Formatted date+time %s \n",formattedDate);
+
+            String encodedDateTime = URLEncoder.encode(formattedDate, "UTF-8");
+            System.out.printf("URL encoded date-time %s \n",encodedDateTime);
+
+            String decodedDateTime = URLDecoder.decode(encodedDateTime, "UTF-8");
+            System.out.printf("URL decoded date-time %s \n",decodedDateTime);
+
+
+            System.out.println(fixDate(encodedDateTime));
             //Sends 200 OK response headers, sends file data, closes output stream, returns
             output.print("HTTP/1.0 200 OK\r\n");
             output.print("Content-Type: " + mimeType + "\r\n");
@@ -428,6 +449,7 @@ public class HTTP1Threads extends Thread{
             output.print("Allow: GET, POST, HEAD\r\n");
             output.print("Content-Encoding: identity\r\n");
             output.print("Expires: Wed, 02 Oct 2024 01:37:39 GMT\r\n");
+            output.print("Set-Cookie: lasttime=" + fixDate(encodedDateTime) + "\r\n");
             output.print("\r\n"); // End of headers
 
             //Sends file data if method is GET or POST, as HEAD does not send file data
@@ -535,5 +557,16 @@ public class HTTP1Threads extends Thread{
             }
         }
         return ret;
+    }
+    private String fixDate(String date) {
+        String ret = "";
+        ret += date.substring(6, 10) + "-";
+        ret += date.substring(3, 5) + "-";
+        ret += date.substring(0, 2) + date.substring(10);
+        return ret;
+    }
+
+    private String unfixDate(String date) {
+        return "";
     }
 }
