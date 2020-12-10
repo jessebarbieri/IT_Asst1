@@ -65,10 +65,15 @@ public class HTTP1Threads extends Thread{
                 sb.append(c);
             }
 
+            String cookie = "";
+
             //Splits the string from the StringBuilder by \r\n, or the end of each individual input line
             String[] inputLines = sb.toString().split("\r\n");
             for (int i = 0; i < inputLines.length; i++) {
                 inputLines[i] = decodeString(inputLines[i]);
+                if (inputLines[i].indexOf("Cookie:") != -1) {
+                    cookie = inputLines[i];
+                }
             }
 
 
@@ -172,7 +177,7 @@ public class HTTP1Threads extends Thread{
                 }
 
                 //Passes control to the sendFile method, which handles other HTTP headers/sending byte data
-                sendFile(output, fileURL, ifModifiedDate, method);
+                sendFile(output, fileURL, ifModifiedDate, method, cookie);
                 output.close();
                 input.close();
                 connection.close();
@@ -366,7 +371,7 @@ public class HTTP1Threads extends Thread{
      * @param ifModifiedDate conditional date if present in client's request
      * @param method command from client's request (GET, HEAD, or POST)
      */
-    private void sendFile(PrintStream output, String filename, String ifModifiedDate, String method) {
+    private void sendFile(PrintStream output, String filename, String ifModifiedDate, String method, String cookie) {
         //File for client's requested file
         File file;
 
@@ -374,10 +379,25 @@ public class HTTP1Threads extends Thread{
             //Instantiates file and gets inputstream from file
 
             if (filename.equals("/")) {
-                file = new File(".", "/index.html");
+                if (cookie.equals("")) {
+                    file = new File(".", "/index.html");
+                } else {
+                    //TODO - Create HTML File for seen (include date time)
+                    String dateTime = cookie.substring(cookie.indexOf("=") + 1);
+                    file = new File(".", "/index_seen.html");
+
+                }
             } else {
                 file = new File(".", filename.substring(1, filename.length()));
             }
+
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String crntLine = "";
+            String fileString = "";
+            while ((crntLine = reader.readLine()) != null){ fileString += crntLine; }
+            System.out.println("TEST PART" + fileString);
+
             FileInputStream fileInput = new FileInputStream(file);
 
             //Gets file's mimeType and stores in mimeType -- Defaults to octet-stream if mime type is not supported
@@ -431,13 +451,13 @@ public class HTTP1Threads extends Thread{
             LocalDateTime myDateObj = LocalDateTime.now();
             DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
             String formattedDate = myDateObj.format(myFormatObj);
-            System.out.printf("Formatted date+time %s \n",formattedDate);
+            //System.out.printf("Formatted date+time %s \n",formattedDate);
 
             String encodedDateTime = URLEncoder.encode(formattedDate, "UTF-8");
-            System.out.printf("URL encoded date-time %s \n",encodedDateTime);
+            //System.out.printf("URL encoded date-time %s \n",encodedDateTime);
 
             String decodedDateTime = URLDecoder.decode(encodedDateTime, "UTF-8");
-            System.out.printf("URL decoded date-time %s \n",decodedDateTime);
+            //System.out.printf("URL decoded date-time %s \n",decodedDateTime);
 
 
             System.out.println(fixDate(encodedDateTime));
