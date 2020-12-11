@@ -396,14 +396,19 @@ public class HTTP1Threads extends Thread{
                             builder.append(html);
                         }
                         htmlRead.close();
-                    } catch (Exception e){
+                    } catch (IOException e){
                         e.printStackTrace();
                     }
                     String contents = builder.toString();
+                    String returnedString;
 
-                    String formattedDate = "";
-                    contents = contents.substring(0, contents.indexOf("at:" + 3)) + formattedDate + contents.substring(contents.indexOf("<p>"));
-                    System.out.println(contents);
+                    String formattedDate = fixDate(URLDecoder.decode(unfixDate(cookie.substring(cookie.indexOf("=") + 1))));
+                    returnedString = contents.substring(0, contents.indexOf("at:") + 4) + formattedDate + contents.substring(contents.indexOf("<p></body>"));
+                    System.out.println(returnedString);
+
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+                    writer.write(returnedString);
+                    writer.close();
                 }
 
 
@@ -600,6 +605,11 @@ public class HTTP1Threads extends Thread{
     }
 
     private String unfixDate(String date) {
-        return "";
+        String ret = "";
+        ret += date.substring(8, 10) + "-";
+        ret += date.substring(5, 8);
+        ret += date.substring(0, 4) + date.substring(10);
+
+        return ret;
     }
 }
