@@ -381,24 +381,43 @@ public class HTTP1Threads extends Thread{
             if (filename.equals("/")) {
                 if (cookie.equals("")) {
                     file = new File(".", "/index.html");
+                    System.out.println(file.length());
                 } else {
                     //TODO - Create HTML File for seen (include date time)
                     String dateTime = cookie.substring(cookie.indexOf("=") + 1);
                     file = new File(".", "/index_seen.html");
 
+                    // trying to read the html file into a string
+                    StringBuilder builder = new StringBuilder();
+                    try{
+                        BufferedReader htmlRead = new BufferedReader(new FileReader(file));
+                        String html;
+                        while((html = htmlRead.readLine()) != null){
+                            builder.append(html);
+                        }
+                        htmlRead.close();
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    String contents = builder.toString();
+                    System.out.println(contents);
                 }
             } else {
                 file = new File(".", filename.substring(1, filename.length()));
             }
 
+            /*
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             BufferedReader reader = new BufferedReader(new FileReader(file));
-            String crntLine = "";
+            String crntLine;
             String fileString = "";
-            while ((crntLine = reader.readLine()) != null){ fileString += crntLine; }
+            crntLine = reader.readLine();
+            while (crntLine != null){ fileString += crntLine; }
             System.out.println("TEST PART" + fileString);
-
+  */
             FileInputStream fileInput = new FileInputStream(file);
+
+
 
             //Gets file's mimeType and stores in mimeType -- Defaults to octet-stream if mime type is not supported
             Path path = file.toPath();
@@ -465,6 +484,7 @@ public class HTTP1Threads extends Thread{
             output.print("HTTP/1.0 200 OK\r\n");
             output.print("Content-Type: " + mimeType + "\r\n");
             output.print("Content-Length: " + file.length() + "\r\n");
+            System.out.println(file.length());
             output.print("Last-Modified: " + lastModified + "\r\n");
             output.print("Allow: GET, POST, HEAD\r\n");
             output.print("Content-Encoding: identity\r\n");
