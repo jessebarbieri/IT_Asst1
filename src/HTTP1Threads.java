@@ -388,6 +388,7 @@ public class HTTP1Threads extends Thread{
                     file = new File(".", "/index_seen.html");
 
                     // trying to read the html file into a string
+                    /*
                     StringBuilder builder = new StringBuilder();
                     try{
                         BufferedReader htmlRead = new BufferedReader(new FileReader(file));
@@ -401,23 +402,16 @@ public class HTTP1Threads extends Thread{
                     }
                     String contents = builder.toString();
                     System.out.println(contents);
+
+                     */
                 }
+
+
             } else {
                 file = new File(".", filename.substring(1, filename.length()));
             }
 
-            /*
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            String crntLine;
-            String fileString = "";
-            crntLine = reader.readLine();
-            while (crntLine != null){ fileString += crntLine; }
-            System.out.println("TEST PART" + fileString);
-  */
             FileInputStream fileInput = new FileInputStream(file);
-
-
 
             //Gets file's mimeType and stores in mimeType -- Defaults to octet-stream if mime type is not supported
             Path path = file.toPath();
@@ -484,7 +478,6 @@ public class HTTP1Threads extends Thread{
             output.print("HTTP/1.0 200 OK\r\n");
             output.print("Content-Type: " + mimeType + "\r\n");
             output.print("Content-Length: " + file.length() + "\r\n");
-            System.out.println(file.length());
             output.print("Last-Modified: " + lastModified + "\r\n");
             output.print("Allow: GET, POST, HEAD\r\n");
             output.print("Content-Encoding: identity\r\n");
