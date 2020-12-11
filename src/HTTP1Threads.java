@@ -388,7 +388,6 @@ public class HTTP1Threads extends Thread{
                     file = new File(".", "/index_seen.html");
 
                     // trying to read the html file into a string
-                    /*
                     StringBuilder builder = new StringBuilder();
                     try{
                         BufferedReader htmlRead = new BufferedReader(new FileReader(file));
@@ -401,9 +400,10 @@ public class HTTP1Threads extends Thread{
                         e.printStackTrace();
                     }
                     String contents = builder.toString();
-                    System.out.println(contents);
 
-                     */
+                    String formattedDate = "";
+                    contents = contents.substring(0, contents.indexOf("at:" + 3)) + formattedDate + contents.substring(contents.indexOf("<p>"));
+                    System.out.println(contents);
                 }
 
 
