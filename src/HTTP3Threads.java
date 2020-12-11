@@ -381,7 +381,6 @@ public class HTTP3Threads extends Thread{
             if (filename.equals("/")) {
                 if (cookie.equals("")) {
                     file = new File(".", "/index.html");
-                    System.out.println(file.length());
                 } else {
                     //TODO - Create HTML File for seen (include date time)
                     String dateTime = cookie.substring(cookie.indexOf("=") + 1);
@@ -404,7 +403,6 @@ public class HTTP3Threads extends Thread{
 
                     String formattedDate = fixDate(URLDecoder.decode(unfixDate(cookie.substring(cookie.indexOf("=") + 1))));
                     returnedString = contents.substring(0, contents.indexOf("at:") + 4) + formattedDate + contents.substring(contents.indexOf("<p></body>"));
-                    System.out.println(returnedString);
 
                     BufferedWriter writer = new BufferedWriter(new FileWriter(file));
                     writer.write(returnedString);
@@ -469,16 +467,11 @@ public class HTTP3Threads extends Thread{
             LocalDateTime myDateObj = LocalDateTime.now();
             DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
             String formattedDate = myDateObj.format(myFormatObj);
-            //System.out.printf("Formatted date+time %s \n",formattedDate);
 
             String encodedDateTime = URLEncoder.encode(formattedDate, "UTF-8");
-            //System.out.printf("URL encoded date-time %s \n",encodedDateTime);
 
             String decodedDateTime = URLDecoder.decode(encodedDateTime, "UTF-8");
-            //System.out.printf("URL decoded date-time %s \n",decodedDateTime);
 
-
-            System.out.println(fixDate(encodedDateTime));
             //Sends 200 OK response headers, sends file data, closes output stream, returns
             output.print("HTTP/1.0 200 OK\r\n");
             output.print("Content-Type: " + mimeType + "\r\n");
