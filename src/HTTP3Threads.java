@@ -384,18 +384,17 @@ public class HTTP3Threads extends Thread{
                 if (cookie.equals("")) {
                     file = new File(".", "/index.html");
                 } else {
-                    //TODO - Create HTML File for seen (include date time)
                     boolean cookieValid;
                     String dateValid = fixDate(URLDecoder.decode(unfixDate(cookie.substring(cookie.indexOf("=") + 1)))).trim();
-
+                    LocalDate dateRecieved = null;
                     // Using DateTimeFormatter to check if the date is valid, if the date is able to be parsed, it is a valid date and the cookie is valid
                     try{
-                        LocalDate.parse(dateValid, DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss").withResolverStyle(ResolverStyle.STRICT));
+                        dateRecieved = LocalDate.parse(dateValid, DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss").withResolverStyle(ResolverStyle.STRICT));
                         cookieValid = true;
                     } catch (DateTimeException e){
                         cookieValid = false;
                     }
-                    if(!cookieValid){
+                    if(!cookieValid || dateRecieved.isAfter(LocalDate.now())){
                         file = new File(".", "/index.html");
                     }
                     else{
