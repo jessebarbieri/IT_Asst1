@@ -33,7 +33,7 @@ public class HTTP3Server {
         }
 
         //Creates threadPool with maximum of 50 threads
-        ThreadPoolExecutor threadPool =  new ThreadPoolExecutor(5, 50, 250, TimeUnit.MILLISECONDS, new SynchronousQueue<>());
+        ThreadPoolExecutor threadPool =  new ThreadPoolExecutor(5, 50, 100, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>());
 
         //Server loop, waits for socket connection
         Socket conn = null;

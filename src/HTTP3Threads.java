@@ -12,6 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.format.ResolverStyle;
 import java.util.*;
 import java.net.*;
 import java.util.*;
@@ -377,41 +380,57 @@ public class HTTP3Threads extends Thread{
 
         try {
             //Instantiates file and gets inputstream from file
-
             if (filename.equals("/")) {
                 if (cookie.equals("")) {
                     file = new File(".", "/index.html");
                 } else {
                     //TODO - Create HTML File for seen (include date time)
-                    String dateTime = cookie.substring(cookie.indexOf("=") + 1);
-                    file = new File(".", "/index_seen.html");
+                    boolean cookieValid;
+                    String dateValid = fixDate(URLDecoder.decode(unfixDate(cookie.substring(cookie.indexOf("=") + 1)))).trim();
 
-                    // trying to read the html file into a string
-                    StringBuilder builder = new StringBuilder();
+                    // Using DateTimeFormatter to check if the date is valid, if the date is able to be parsed, it is a valid date and the cookie is valid
                     try{
-                        BufferedReader htmlRead = new BufferedReader(new FileReader(file));
-                        String html;
-                        while((html = htmlRead.readLine()) != null){
-                            builder.append(html);
-                        }
-                        htmlRead.close();
-                    } catch (IOException e){
-                        e.printStackTrace();
+                        LocalDate.parse(dateValid, DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss").withResolverStyle(ResolverStyle.STRICT));
+                        cookieValid = true;
+                    } catch (DateTimeException e){
+                        cookieValid = false;
                     }
-                    String contents = builder.toString();
-                    String returnedString;
+                    if(!cookieValid){
+                        file = new File(".", "/index.html");
+                    }
+                    else{
+                        String dateTime = cookie.substring(cookie.indexOf("=") + 1);
+                        file = new File(".", "/index_seen.html");
 
-                    String formattedDate = fixDate(URLDecoder.decode(unfixDate(cookie.substring(cookie.indexOf("=") + 1))));
-                    returnedString = contents.substring(0, contents.indexOf("at:") + 4) + formattedDate + contents.substring(contents.indexOf("<p></body>"));
+                        // trying to read the html file into a string
+                        StringBuilder builder = new StringBuilder();
+                        try{
+                            BufferedReader htmlRead = new BufferedReader(new FileReader(file));
+                            String html;
+                            while((html = htmlRead.readLine()) != null){
+                                builder.append(html);
+                            }
+                            htmlRead.close();
+                        } catch (IOException e){
+                            e.printStackTrace();
+                        }
+                        String contents = builder.toString();
+                        String returnedString;
 
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-                    writer.write(returnedString);
-                    writer.close();
+                        // Writes the new date into the html file and sends it back to the user
+                        String formattedDate = fixDate(URLDecoder.decode(unfixDate(cookie.substring(cookie.indexOf("=") + 1))));
+                        returnedString = contents.substring(0, contents.indexOf("at:") + 4) + formattedDate + contents.substring(contents.indexOf("<p></body>"));
+
+                        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+                        writer.write(returnedString);
+                        writer.close();
+                    }
                 }
 
 
             } else {
                 file = new File(".", filename.substring(1, filename.length()));
+
             }
 
             FileInputStream fileInput = new FileInputStream(file);
